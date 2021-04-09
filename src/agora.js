@@ -1,3 +1,5 @@
+// electronのときは下記のコメントアウトを外す
+// const { ipcRenderer } = require('electron');
 var client = AgoraRTC.createClient({ mode: "live", codec: "vp8", role: "host" });
 
 var localTracks = {
@@ -43,7 +45,7 @@ function login() {
             // appendProc(options.uid, options.uid + "(you)");
             receiveChannelMessage();
             console.log("ログインできました");
-            $("#show-uid").text("ログインユーザーID：" + options.uid);
+            $("#show-uid").text(options.uid);
             var showUserList = document.getElementById("after-logined");
             showUserList.classList.remove("after-logined");
             var LoginForm = document.getElementById("div_join");
@@ -392,6 +394,14 @@ async function handleTrackEnded() {
     // console.log("handleTrackEnded");
 }
 
+// POPUP表示
+function subWindow() {
+    try {
+        ipcRenderer.send('add-todo-window');
+    } catch (error) {
+        console.log("ボタンうごかんぜよ")
+        const url = 'index.html'
+        window.open(url, '_blank')
+    }
 
-
-
+}

@@ -1,6 +1,6 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-
+// const { app, ipcMain } = require('electron');
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
   app.quit();
@@ -11,6 +11,10 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
   });
 
   // and load the index.html of the app.
@@ -44,3 +48,29 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+
+// add todo window
+let addTodoWin;
+
+// create add todo window
+ipcMain.on('add-todo-window', () => {
+  if (!addTodoWin) {
+    addTodoWin = new BrowserWindow({
+      // file: path.join(__dirname, 'index.html'),
+      width: 400,
+      height: 400,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      }
+    });
+    addTodoWin.loadFile(path.join(__dirname, 'index.html'));
+    addTodoWin.webContents.openDevTools();
+    addTodoWin.on('closed', () => {
+      addTodoWin = null;
+    });
+  }
+});
+
+

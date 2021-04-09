@@ -8,6 +8,10 @@
   <title>Agora WebSDK Demos</title>
   <link rel="stylesheet" href="assets/bootstrap.min.css">
   <link rel="stylesheet" href="assets/index.css">
+  <script>
+    // electronを起動するときは、コメントアウトを外す
+    // window.jQuery = window.$ = require('/Users/nakamitsunozomi/Desktop/my-electron-app_fix/src/assets/jquery-3.4.1.min.js');
+    </script>
   <script src="agora-rtm-sdk-1.4.1.js"></script>
   <!-- <script src="AgoraRTC_N-4.3.0.js"></script> -->
   <script src="https://download.agora.io/sdk/web/AgoraRTC_N-4.1.0.js"></script>
@@ -17,7 +21,7 @@
 <body>
   <div class="container-fluid banner">
     <p>Agora WebSDK サンプルアプリ</p>
-    <div class="user-info">
+    <div class="user-info">ログインユーザーID：
       <p id="show-uid"></p>
     </div>
     <p><a href="#" onclick="history.back(); return false;">前のページにもどる</a></p>
@@ -90,6 +94,8 @@
       onclick="screensharing()">画面共有する</button>
     <button id="stopScreensharing" type="button" class="btn btn-warning stopScreensharing" style="color: white;"
       onclick="handleTrackEnded()">画面共有を停止する</button>
+    <button id="subwindow" type="button" class="btn btn-info" style="color: white;"
+      onclick="subWindow()">子ウィンドウを開く</button>
     <table class="table my-5 showUserList" id="user-list">
       <thead>
         <tr>

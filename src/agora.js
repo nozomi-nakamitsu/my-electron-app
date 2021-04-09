@@ -26,7 +26,12 @@ var random = Math.floor(Math.random() * 99999) + 1;
 var uidRtm;
 
 
+var client2 = AgoraRTC.createClient({ mode: "live", codec: "vp8", role: "host" });
 
+var localTracks2 = {
+    videoTrack: null,
+    audioTrack: null
+};
 
 function login() {
     clientRtm = AgoraRTM.createInstance(options.appid);
@@ -62,21 +67,40 @@ function login() {
 }
 
 
-async function subscribe(user, mediaType) {
-    const uid = user.uid;
-    // subscribe to a remote user
-    await client.subscribe(user, mediaType);
-    console.log("subscribe success");
-    if (mediaType === 'video') {
+async function subscribe(user, mediaType, localTracks) {
+    if (localTracks === undefined) {
+        const uid = user.uid;
+        // subscribe to a remote user
+        await client.subscribe(user, mediaType);
+        console.log("subscribe success");
+        if (mediaType === 'video') {
 
-        if ($('#local-player' + uid).length === 0) {
-            $('#local-player').append('<div id="agora_remote' + uid + '" style="float:left; width:810px;height:607px;display:inline-block;"></div>');
+            if ($('#local-player' + uid).length === 0) {
+                $('#local-player').append('<div id="agora_remote' + uid + '" style="float:left; width:810px;height:607px;display:inline-block;"></div>');
+            }
+            user.videoTrack.play('agora_remote' + uid);
         }
-        user.videoTrack.play('agora_remote' + uid);
+        if (mediaType === 'audio') {
+            user.audioTrack.play();
+        }
+    } else {
+        const uid = user.uid;
+        // subscribe to a remote user
+        await client.subscribe(user, mediaType);
+        console.log("subscribe success");
+        if (mediaType === 'video') {
+
+            if ($('#local-player' + uid).length === 0) {
+                $('#local-player').append('<div id="agora_remote' + uid + '" style="float:left; width:810px;height:607px;display:inline-block;"></div>');
+            }
+            // user.videoTrack.play('agora_remote' + uid);
+            localTracks.play('agora_remote' + uid);
+        }
+        if (mediaType === 'audio') {
+            user.audioTrack.play();
+        }
     }
-    if (mediaType === 'audio') {
-        user.audioTrack.play();
-    }
+
 
 }
 function handleUserPublished(user, mediaType) {
@@ -141,6 +165,12 @@ async function leave() {
             localTracks[trackName] = undefined;
         }
     }
+    // 画面共有を終了する
+    var track2 = localTracks2["videoTrack"];
+    if (track2 != null) {
+        handleTrackEnded();
+    }
+
     // remove remote users and player views
     remoteUsers = {};
 
@@ -356,32 +386,46 @@ function removeChannel(channelName) {
 
 
 // 画面共有
-async function screensharing() {
+async function screensharing(channelName) {
+
     // var localPlayer = document.getElementById("local-player");
     // localPlayer.classList.remove("stopScreensharing");
+    if (channelName === undefined) {
+        channelName = options.channel
+    }
+    // client.on("user-published", handleUserPublished);
+    // client.on("user-unpublished", handleUserUnpublished);
 
-    [localTracks.videoTrack] = await Promise.all([
-        AgoraRTC.createScreenVideoTrack({ encoderConfig: { width: { max: 1280 }, height: { max: 720 }, frameRate: 30 } }, "disable")
+    [localTracks2.videoTrack] = await Promise.all([
+        AgoraRTC.createScreenVideoTrack({ encoderConfig: { width: { max: 1280 }, height: { max: 720 }, frameRate: 30 } }, "disable"),
+        client2.join(options.appid, channelName, options.token || null, options.uid + "aaa"),
     ]);
-    localTracks.videoTrack.on("track-ended", handleTrackEnded);
-    localTracks.videoTrack.play("local-player");
+    localTracks2.videoTrack.on("track-ended", handleTrackEnded);
+    localTracks2.videoTrack.play("local-player");
+
     var stopScreensharing = document.getElementById("stopScreensharing");
     stopScreensharing.classList.remove("stopScreensharing");
-
     // publish local tracks to channel
-    // await client.publish(Object.values(localTracks));
+    await client2.publish(Object.values(localTracks2));
     // console.log("publish success");
+    subscribe(options.uid + "aaa", "video", localTracks2);
+
 
 }
+
+
+
+
 // 画面共有停止
 async function handleTrackEnded() {
-    var track = localTracks["videoTrack"];
+    var track = localTracks2["videoTrack"];
     console.log(track);
     if (track) {
         track.stop();
         track.close();
-        // localTracks["videoTrack"] = undefined;
+        localTracks2["videoTrack"] = undefined;
     }
+    await client2.leave();
     var stopScreensharing = document.getElementById("stopScreensharing");
     stopScreensharing.classList.add("stopScreensharing");
 
@@ -391,6 +435,8 @@ async function handleTrackEnded() {
     // client.unpublish(track);
     // console.log("handleTrackEnded");
 }
+
+
 
 
 

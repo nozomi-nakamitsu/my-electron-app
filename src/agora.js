@@ -69,8 +69,8 @@ async function subscribe(user, mediaType) {
     console.log("subscribe success");
     if (mediaType === 'video') {
 
-        if ($('div#video #agora_remote' + uid).length === 0) {
-            $('div#video').append('<div id="agora_remote' + uid + '" style="float:left; width:810px;height:607px;display:inline-block;"></div>');
+        if ($('#local-player' + uid).length === 0) {
+            $('#local-player').append('<div id="agora_remote' + uid + '" style="float:left; width:810px;height:607px;display:inline-block;"></div>');
         }
         user.videoTrack.play('agora_remote' + uid);
     }

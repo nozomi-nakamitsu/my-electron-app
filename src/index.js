@@ -14,7 +14,7 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, '/AgoraWebSDK-NG/Demo/index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
   // mainWindow.loadURL("https://share-house-app.herokuapp.com/");
   // Open the DevTools.
   mainWindow.webContents.openDevTools();

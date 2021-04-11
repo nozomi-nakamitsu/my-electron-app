@@ -72,22 +72,27 @@ async function subscribe(user, mediaType, localTracks) {
         const uid = user.uid;
         // subscribe to a remote user
         await client.subscribe(user, mediaType);
-        console.log("subscribe success");
+        console.log(mediaType);
+        console.log(user);
+        console.log(uid);
+
         if (mediaType === 'video') {
 
             if ($('#local-player' + uid).length === 0) {
                 $('#local-player').append('<div id="agora_remote' + uid + '" style="float:left; width:810px;height:607px;display:inline-block;"></div>');
             }
             user.videoTrack.play('agora_remote' + uid);
+            console.log("subscribe success");
         }
         if (mediaType === 'audio') {
             user.audioTrack.play();
         }
+
     } else {
         const uid = user.uid;
         // subscribe to a remote user
         await client.subscribe(user, mediaType);
-        console.log("subscribe success");
+        console.log(mediaType);
         if (mediaType === 'video') {
 
             if ($('#local-player' + uid).length === 0) {
@@ -99,6 +104,7 @@ async function subscribe(user, mediaType, localTracks) {
         if (mediaType === 'audio') {
             user.audioTrack.play();
         }
+        console.log("subscribe success");
     }
 
 
@@ -402,13 +408,16 @@ async function screensharing(channelName) {
     ]);
     localTracks2.videoTrack.on("track-ended", handleTrackEnded);
     localTracks2.videoTrack.play("local-player");
-
+    console.log(localTracks2.videoTrack);
     var stopScreensharing = document.getElementById("stopScreensharing");
     stopScreensharing.classList.remove("stopScreensharing");
     // publish local tracks to channel
     await client2.publish(Object.values(localTracks2));
     // console.log("publish success");
-    subscribe(options.uid + "aaa", "video", localTracks2);
+    await handleUserPublished(senderId, "video");
+    // client.on("user-published", handleUserPublished);
+    // client.on("user-unpublished", handleUserUnpublished);
+    // await subscribe(options.uid + "aaa", "video", localTracks2.videoTrack);
 
 
 }
